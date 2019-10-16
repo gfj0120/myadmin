@@ -15,6 +15,7 @@
         <el-aside width="200px">
            <!-- default-active="2"配置默认高亮的导航 -->
           <el-menu
+             router
              unique-opened
              class="el-menu-vertical-demo"
 
@@ -27,8 +28,8 @@
                  <i class="el-icon-location"></i>
                  <span>用户管理</span>
                </template>
-               <!-- 配置展开的内容 -->
-              <el-menu-item index="1-1">
+               <!-- 配置展开的内容  配置的路径当成绝对路径  等于/users-->
+              <el-menu-item index="users">
                 <i class="el-icon-menu"></i>
                 <span slot="title">用户列表</span>
               </el-menu-item>
@@ -42,11 +43,11 @@
                  <span>权限管理</span>
                </template>
                <!-- 配置展开的内容 -->
-              <el-menu-item index="2-1">
+              <el-menu-item index="roles">
                 <i class="el-icon-menu"></i>
                 <span slot="title">角色列表</span>
               </el-menu-item>
-               <el-menu-item index="2-2">
+               <el-menu-item index="rights">
                 <i class="el-icon-menu"></i>
                 <span slot="title">权限列表</span>
               </el-menu-item>
@@ -54,7 +55,9 @@
 
     </el-menu>
         </el-aside>
-        <el-main>Main</el-main>
+        <el-main>
+          <router-view></router-view>
+          </el-main>
       </el-container>
     </el-container>
 
@@ -72,7 +75,7 @@ export default {
         localStorage.removeItem('token')
         this.$router.push('/login')
       }).catch(err => {
-        this.$message.err(err)
+        this.$message.error(err)
       })
     }
   }
