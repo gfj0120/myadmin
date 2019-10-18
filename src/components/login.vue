@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+
 //  ref 和 $refs
 //  作用: 用于结合在一起, 获取dom元素或者获取vue组件实例
 //  1. 可以获取dom元素
@@ -51,38 +51,58 @@ export default {
       // console.log(this.$refs) 能够拿到form
       this.$refs.form.resetFields()
     },
-    login () {
-      this.$refs.form.validate(isValid => {
-        if (!isValid) return
-        // axios({
-        //   method: 'post',
-        //   url: 'http://localhost:8888/api/private/v1/login',
-        //   data: this.form
-        // }).then(res => {
-        //   const { meta } = res.data
-        //   if (meta.status === 200) {
-        //     this.$router.push('./index')
-        //   } else {
-        //     console.log(meta.msg)
-        //   }
-        // })
-        // axios.post(url, data).then(..).catch(..)
-        axios.post('http://localhost:8888/api/private/v1/login', this.form).then(res => {
-          // console.log(res.data)
-          const { meta, data } = res.data
-          if (meta.status === 200) {
-            localStorage.setItem('token', data.token)
-            this.$message({
-              message: meta.msg,
-              type: 'success'
-            })
-            this.$router.push({ name: 'index' })
-          } else {
-            // 3. 可以在调用方法的同时, 指定提示的类型
-            this.$message.error(meta.msg)
-          }
-        })
-      })
+    async login () {
+      try {
+        await this.$refs.form.validate()
+        console.log('成功了')
+        const { meta, data } = await this.$axios.post('login', this.form)
+        if (meta.status === 200) {
+          localStorage.setItem('token', data.token)
+          this.$message({
+            message: meta.msg,
+            type: 'success'
+          })
+          this.$router.push({ name: 'index' })
+        } else {
+          // 3. 可以在调用方法的同时, 指定提示的类型
+          this.$message.error(meta.msg)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+      // this.$refs.form.validate(isValid => {
+      //   if (!isValid) return
+      //
+      // axios({
+      //   method: 'post',
+      //   url: 'http://localhost:8888/api/private/v1/login',
+      //   data: this.form
+      // }).then(res => {
+      //   const { meta } = res.data
+      //   if (meta.status === 200) {
+      //     this.$router.push('./index')
+      //   } else {
+      //     console.log(meta.msg)
+      //   }
+      // })
+      // axios.post(url, data).then(..).catch(..)
+
+      // 改写
+      // this.$axios.post('login', this.form).then(res => {
+      //   // console.log(res.data)
+      //   const { meta, data } = res
+      //   if (meta.status === 200) {
+      //     localStorage.setItem('token', data.token)
+      //     this.$message({
+      //       message: meta.msg,
+      //       type: 'success'
+      //     })
+      //     this.$router.push({ name: 'index' })
+      //   } else {
+      //     // 3. 可以在调用方法的同时, 指定提示的类型
+      //     this.$message.error(meta.msg)
+      //   }
+      // })
     }
   }
 }

@@ -5,7 +5,7 @@
         <div class="left">
           <img src="../assets/logo.png" alt="">
         </div>
-        <div class="main"><h1>电商后台管理</h1></div>
+        <div class="title"><h1>电商后台管理</h1></div>
         <div class="right">
           <strong>欢迎光临~~</strong>
           <a href="javascript:;" @click="logout">退出</a>
@@ -109,10 +109,11 @@ export default {
            font-weight: 700;
          }
        }
-      .main {
+      .title {
       flex: 1;
       text-align: center;
       line-height: 60px;
+
       }
     }
     .el-aside {
@@ -121,8 +122,8 @@ export default {
         border-right: 0;
       }
     }
-    .main {
-      background-position-x: #ecf0f1;
+    .el-main {
+      background-color: #ecf0f1;
     }
   }
 </style>
