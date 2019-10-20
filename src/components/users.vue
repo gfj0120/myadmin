@@ -49,7 +49,7 @@
         <template v-slot:default="obj">
            <el-button @click="showChange(obj.row)" plain size="small" type="primary" icon="el-icon-edit" ></el-button>
            <el-button @click="delUser(obj.row.id)" plain size="small" type="danger" icon="el-icon-delete" ></el-button>
-           <el-button plain size="small" type="success" icon="el-icon-check" >分配角色</el-button>
+           <el-button @click="showRole(obj.row)" plain size="small" type="success" icon="el-icon-check" >分配角色</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -112,7 +112,7 @@
      <!-- 表单内容 -->
     <el-form :model="changeForm" :rules="rules" ref="changeForm" label-width="80px">
        <el-form-item  label="用户名" prop="email">
-       <p>{{ changeForm.username}}</p>
+       <el-tag type="info">{{ changeForm.username}}</el-tag>
       </el-form-item>
 
       <el-form-item  label="邮箱" prop="email">
@@ -127,6 +127,33 @@
        <el-button @click="dialogVisible = false">取 消</el-button>
        <el-button  @click="changeUser" type="primary">确 定</el-button>
      </span>
+   </el-dialog>
+   <!-- 分配角色模态框 -->
+   <el-dialog
+      title="添加角色"
+      :visible.sync="roleVisible"
+      width="40%">
+      <el-form :model="addRoles" label-width="80px">
+         <el-form-item  label="用户名">
+           <el-tag type="info">{{ addRoles.username}}</el-tag>
+         </el-form-item>
+
+         <el-form-item  label="角色列表">
+           <!-- v-model绑定的值,就是option的value的值 -->
+            <el-select v-model="addRoles.rid" placeholder="请选择">
+              <el-option
+                v-for="item in options"
+                :key="item.id"
+                :label="item.roleName"
+                :value="item.id">
+              </el-option>
+            </el-select>
+         </el-form-item>
+     </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button @click="assignRoles" type="primary">分配</el-button>
+      </span>
    </el-dialog>
   </div>
 </template>
@@ -175,7 +202,14 @@ export default {
         username: '',
         email: '',
         mobile: ''
-      }
+      },
+      roleVisible: false,
+      addRoles: {
+        id: '', // 用户的id
+        rid: '', // 角色id
+        username: '' // 用户回显的名字
+      },
+      options: []
 
     }
   },
@@ -363,6 +397,51 @@ export default {
         }
       } catch (e) {
         console.log(e)
+      }
+    },
+    // 展示 分配角色模态框
+    async showRole (row) {
+      console.log(row)
+      this.roleVisible = true
+      // 回显数据
+      this.addRoles.username = row.username
+      this.addRoles.id = row.id
+      // 原有的角色也要回显
+      // this.addRoles.rid = row.rid
+      const res = await this.$axios.get(`users/${row.id}`)
+      // console.log(res)
+      if (res.meta.status === 200) {
+        // this.addRoles.rid = res.data.rid
+        // 新用户显示时-1,处理下是空白
+        const rid = res.data.rid
+        this.addRoles.rid = rid === -1 ? '' : rid
+      } else {
+        this.$message.error(res.meta.msg)
+      }
+
+      // 一展示对话框就发送请求,获取角色列表,用于让用户选择
+      const { data, meta } = await this.$axios.get('roles')
+      if (meta.status === 200) {
+        console.log(data)
+        this.options = data
+      } else {
+        this.$message.error(meta.msg)
+      }
+    },
+    // 分配角色提交
+    async assignRoles () {
+      const { id, rid } = this.addRoles
+      if (this.addRoles.rid === '') {
+        this.$message.error('请选择角色分类')
+        return
+      }
+      const { meta } = await this.$axios.put(`users/${id}`, { rid })
+      if (meta.status === 200) {
+        this.$message.success(meta.msg)
+        this.roleVisible = false
+        this.getUserList()
+      } else {
+        this.$message.error(meta.msg)
       }
     }
   }
