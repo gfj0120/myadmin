@@ -15,6 +15,7 @@
         <el-aside width="200px">
            <!-- default-active="2"配置默认高亮的导航 -->
           <el-menu
+            :default-active="defaultActive"
              router
              unique-opened
              class="el-menu-vertical-demo"
@@ -22,34 +23,16 @@
              background-color="#545c64"
              text-color="#fff"
              active-text-color="#ffd04b">
-             <el-submenu index="1">
+             <el-submenu :index="menu.path"  v-for="menu in menusList" :key="menu.id">
                <!-- 配置导航的标题 -->
                <template v-slot:title>
                  <i class="el-icon-location"></i>
-                 <span>用户管理</span>
+                 <span>{{ menu.authName }}</span>
                </template>
                <!-- 配置展开的内容  配置的路径当成绝对路径  等于/users-->
-              <el-menu-item index="users">
+              <el-menu-item :index="item.path" v-for="item in menu.children" :key="item.id">
                 <i class="el-icon-menu"></i>
-                <span slot="title">用户列表</span>
-              </el-menu-item>
-             </el-submenu>
-
-             <!-- 第二部分 -->
-              <el-submenu index="2">
-               <!-- 配置导航的标题 -->
-               <template v-slot:title>
-                 <i class="el-icon-location"></i>
-                 <span>权限管理</span>
-               </template>
-               <!-- 配置展开的内容 -->
-              <el-menu-item index="roles">
-                <i class="el-icon-menu"></i>
-                <span slot="title">角色列表</span>
-              </el-menu-item>
-               <el-menu-item index="rights">
-                <i class="el-icon-menu"></i>
-                <span slot="title">权限列表</span>
+                <span slot="title">{{ item.authName}}</span>
               </el-menu-item>
              </el-submenu>
 
@@ -65,6 +48,21 @@
 
 <script>
 export default {
+  data () {
+    return {
+      menusList: []
+    }
+  },
+  async created () {
+    const { data, meta } = await this.$axios.get('menus')
+    // console.log(res)
+    if (meta.status === 200) {
+      this.menusList = data
+      console.log(this.menusList)
+    } else {
+      this.$message.erroe(meta.msg)
+    }
+  },
   methods: {
     logout () {
       this.$confirm('亲,确定要退出吗', '温馨提示', {
@@ -77,6 +75,11 @@ export default {
       }).catch(err => {
         this.$message.error(err)
       })
+    }
+  },
+  computed: {
+    defaultActive () {
+      return this.$route.path.slice(1)
     }
   }
 }

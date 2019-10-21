@@ -424,6 +424,7 @@ export default {
       if (meta.status === 200) {
         console.log(data)
         this.options = data
+        console.log(this.options)
       } else {
         this.$message.error(meta.msg)
       }
