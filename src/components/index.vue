@@ -58,7 +58,7 @@ export default {
     // console.log(res)
     if (meta.status === 200) {
       this.menusList = data
-      console.log(this.menusList)
+      // console.log(this.menusList)
     } else {
       this.$message.erroe(meta.msg)
     }
